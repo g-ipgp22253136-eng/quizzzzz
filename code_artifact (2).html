@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二年级科学：公主的城堡舞会化妆间（讲义第6页特训）</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #fae8ff 0%, #fce7f3 50%, #fef3c7 100%);
+            user-select: none;
+            overflow-x: hidden;
+        }
+        .royal-shadow {
+            box-shadow: 0 8px 0 rgba(168, 85, 247, 0.18), 0 15px 25px rgba(236, 72, 153, 0.16);
+        }
+        .btn-magic {
+            transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-magic:hover {
+            transform: translateY(-3px);
+        }
+        .btn-magic:active {
+            transform: translateY(2px);
+        }
+        .pop-in {
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .shake {
+            animation: shake 0.35s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .float-royal {
+            animation: floatRoyal 3s ease-in-out infinite;
+        }
+        @keyframes floatRoyal {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        /* 保持镜子找茬热点平稳不晃动，悬停时发出金色魔法光晕 */
+        .mirror-hotspot {
+            cursor: pointer;
+            pointer-events: all;
+            transition: filter 0.2s ease;
+        }
+        .mirror-hotspot:hover {
+            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.95));
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-3 md:p-5 text-slate-800">
+
+    <!-- 顶部皇家化妆间状态栏 -->
+    <div id="hud" class="hidden w-full max-w-4xl bg-white/95 backdrop-blur border-4 border-purple-300 rounded-3xl p-3 md:p-4 mb-3 flex flex-wrap justify-between items-center royal-shadow">
+        <div class="flex items-center space-x-3">
+            <span id="stage-badge" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-black px-3.5 py-1 rounded-full text-xs md:text-sm shadow">
+                装扮第一关
+            </span>
+            <div>
+                <h1 id="stage-title" class="font-black text-base md:text-xl text-purple-700">魔法镜子找隐患</h1>
+                <p id="stage-sub" class="text-xs text-slate-500 hidden sm:block">讲义第6页：科学室规则（进入前与实验安全）</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3 md:space-x-4 mt-2 sm:mt-0">
+            <!-- 舞会装扮收集进度 -->
+            <div class="bg-purple-50 px-3 py-1.5 rounded-2xl border-2 border-purple-200 flex items-center space-x-1.5">
+                <span class="text-xs text-purple-700 font-bold hidden md:inline">装扮：</span>
+                <span id="outfit-icons" class="text-base md:text-lg tracking-wider">👗🔒 👑🔒 👠🔒</span>
+            </div>
+
+            <!-- 宝石积分 -->
+            <div class="bg-amber-50 px-3.5 py-1.5 rounded-2xl border-2 border-amber-300 flex items-center space-x-1">
+                <span class="text-lg">💎</span>
+                <span id="gem-score" class="text-lg md:text-2xl font-black text-amber-500">0</span>
+            </div>
+
+            <!-- 返回大厅 -->
+            <button onclick="showHome()" class="bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold text-xs px-3 py-2.5 rounded-2xl border-2 border-pink-300 transition">
+                回化妆间
+            </button>
+        </div>
+    </div>
+
+    <!-- 主化妆间舞台容器 -->
+    <div id="castle-stage" class="w-full max-w-4xl bg-white/95 rounded-[2rem] border-4 border-purple-300 royal-shadow overflow-hidden relative min-h-[560px] flex flex-col justify-between">
+
+        <!-- ==================== 开始大厅画面 ==================== -->
+        <div id="start-screen" class="p-6 md:p-10 text-center bg-gradient-to-b from-purple-50 via-white to-pink-50 flex-1 flex flex-col items-center justify-center">
+            <div class="inline-block bg-purple-100 border-2 border-purple-300 text-purple-700 font-black px-4 py-1 rounded-full text-xs md:text-sm mb-3">
+                ✨ 二年级科学 · 单元二：科学室规则（讲义第6页特训） ✨
+            </div>
+            <div class="text-6xl md:text-7xl mb-3 float-royal">👸🪞👗👑👠</div>
+            <h1 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 mb-3 tracking-wide">
+                公主的城堡舞会化妆间
+            </h1>
+            <p class="text-slate-600 text-sm md:text-base max-w-xl mb-6 font-bold leading-relaxed">
+                今晚城堡要举办盛大的皇家舞会啦！<br>
+                请小造型师帮小公主守好 <span class="text-purple-600">科学室规则</span>，依次解锁 <span class="text-pink-500">蓬蓬礼服、星光皇冠与水晶鞋</span> 吧！
+            </p>
+
+            <!-- 三大装扮关卡卡片（支持单独点击某一关或连续换装） -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl mb-7 text-left">
+                <div onclick="startStage(1)" class="btn-magic cursor-pointer bg-pink-50 hover:bg-pink-100 border-2 border-pink-300 rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="bg-pink-500 text-white text-xs font-black px-2.5 py-0.5 rounded-full">第一关 · 解锁礼服👗</span>
+                        <span class="text-2xl">🪞🔍</span>
+                    </div>
+                    <div class="font-black text-pink-800 text-base mt-1">魔法镜子找隐患</div>
+                    <p class="text-xs text-slate-600 mt-1">照一照镜子里的模拟科学室，点出 <b>5 个违反规则</b> 的危险行为！</p>
+                </div>
+
+                <div onclick="startStage(2)" class="btn-magic cursor-pointer bg-purple-50 hover:bg-purple-100 border-2 border-purple-300 rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="bg-purple-500 text-white text-xs font-black px-2.5 py-0.5 rounded-full">第二关 · 解锁皇冠👑</span>
+                        <span class="text-2xl">🎒🚪</span>
+                    </div>
+                    <div class="font-black text-purple-800 text-base mt-1">门卫安检门</div>
+                    <p class="text-xs text-slate-600 mt-1">进入科学室前，判断书包、铅笔盒、饮料等物品能不能带进去！</p>
+                </div>
+
+                <div onclick="startStage(3)" class="btn-magic cursor-pointer bg-amber-50 hover:bg-amber-100 border-2 border-amber-300 rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="bg-amber-500 text-white text-xs font-black px-2.5 py-0.5 rounded-full">第三关 · 解锁水晶鞋👠</span>
+                        <span class="text-2xl">🔥🧪</span>
+                    </div>
+                    <div class="font-black text-amber-800 text-base mt-1">紧急情况大救援</div>
+                    <p class="text-xs text-slate-600 mt-1">遇到受伤、打破玻璃仪器或离开科学室时，选出最安全的做法！</p>
+                </div>
+            </div>
+
+            <button onclick="startFullMakeover()" class="btn-magic bg-gradient-to-r from-purple-500 via-pink-500 to-amber-500 text-white font-black text-xl md:text-2xl px-12 py-4 rounded-full shadow-lg shadow-pink-300">
+                开始为公主盛装打扮！✨👑
+            </button>
+        </div>
+
+        <!-- ==================== 第一关：魔法镜子找隐患（解锁礼服 👗） ==================== -->
+        <div id="stage1-screen" class="hidden p-4 md:p-6 flex-1 flex flex-col justify-between bg-gradient-to-b from-pink-50/70 to-purple-50/50">
+            <div class="text-center">
+                <span class="inline-block bg-pink-100 text-pink-600 font-black px-3 py-1 rounded-full text-xs mb-1">
+                    讲义第6页 · 科学室规则（已纠错 <span id="s1-found">0</span> / 5 处）
+                </span>
+                <h2 class="text-lg md:text-2xl font-black text-slate-800">点击魔法镜子里【违反科学室规则】的 5 个地方！</h2>
+            </div>
+
+            <!-- 魔法镜子 SVG 互动画面 -->
+            <div class="my-2 mx-auto w-full max-w-3xl bg-white border-4 border-amber-300 rounded-3xl p-2 shadow-inner overflow-hidden">
+                <svg viewBox="0 0 900 420" class="w-full h-auto block">
+                    <!-- 镜子背景墙与桌面 -->
+                    <rect x="0" y="0" width="900" height="420" rx="20" fill="#fdf4ff"/>
+                    <rect x="0" y="290" width="900" height="130" fill="#f3e8ff"/>
+                    <!-- 镜子顶部皇冠装饰 -->
+                    <text x="450" y="34" fill="#a855f7" font-size="18" font-weight="bold" text-anchor="middle">🪞 皇家科学室安全检查镜（点击 5 处违规行为）</text>
+
+                    <!-- 实验长桌 -->
+                    <rect x="70" y="255" width="760" height="24" rx="8" fill="#f472b6" stroke="#db2777" stroke-width="3"/>
+                    <rect x="110" y="279" width="28" height="115" fill="#db2777"/>
+                    <rect x="762" y="279" width="28" height="115" fill="#db2777"/>
+
+                    <!-- 窗户（开窗通风指示） -->
+                    <rect x="65" y="55" width="130" height="110" rx="8" fill="#e0f2fe" stroke="#38bdf8" stroke-width="4"/>
+                    <line x1="130" y1="55" x2="130" y2="165" stroke="#38bdf8" stroke-width="3"/>
+                    <text x="130" y="182" fill="#0284c7" font-size="12" font-weight="bold" text-anchor="middle">✅ 门窗已打开</text>
+
+                    <!-- 规则公告牌 -->
+                    <rect x="690" y="55" width="150" height="110" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="4"/>
+                    <text x="765" y="88" fill="#b45309" font-size="14" font-weight="bold" text-anchor="middle">📜 科学室规则</text>
+                    <text x="765" y="112" fill="#78350f" font-size="12" text-anchor="middle">1. 排队进入</text>
+                    <text x="765" y="132" fill="#78350f" font-size="12" text-anchor="middle">2. 禁止吃喝奔跑</text>
+                    <text x="765" y="152" fill="#78350f" font-size="12" text-anchor="middle">3. 禁止擅自品尝</text>
+
+                    <!-- 5个找茬目标（讲义第6页 5条核心规则） -->
+                    <!-- 0: 在科学室里吃汉堡喝饮料 -->
+                    <g id="m-item-0" class="mirror-hotspot" onclick="clickMirrorItem(0)" transform="translate(115, 195)">
+                        <rect x="-10" y="-15" width="120" height="75" fill="rgba(255,255,255,0.01)" pointer-events="all"/>
+                        <text x="25" y="42" font-size="40">🍔</text>
+                        <text x="68" y="42" font-size="38">🧋</text>
+                        <text x="52" y="0" fill="#dc2626" font-size="13" font-weight="bold" text-anchor="middle">偷吃东西!</text>
+                    </g>
+
+                    <!-- 1: 在科学室里嬉戏追逐奔跑 -->
+                    <g id="m-item-1" class="mirror-hotspot" onclick="clickMirrorItem(1)" transform="translate(275, 85)">
+                        <rect x="-15" y="-15" width="160" height="130" fill="rgba(255,255,255,0.01)" pointer-events="all"/>
+                        <text x="45" y="75" font-size="52">🏃‍♂️💨</text>
+                        <text x="105" y="75" font-size="48">🏃‍♀️</text>
+                        <text x="75" y="12" fill="#dc2626" font-size="14" font-weight="bold" text-anchor="middle">追逐奔跑嬉戏!</text>
+                    </g>
+
+                    <!-- 2: 擅自品尝科学材料（瓶装液体） -->
+                    <g id="m-item-2" class="mirror-hotspot" onclick="clickMirrorItem(2)" transform="translate(465, 180)">
+                        <rect x="-15" y="-15" width="125" height="90" fill="rgba(255,255,255,0.01)" pointer-events="all"/>
+                        <text x="20" y="55" font-size="44">👅</text>
+                        <text x="62" y="55" font-size="44">🧪</text>
+                        <text x="48" y="2" fill="#dc2626" font-size="13" font-weight="bold" text-anchor="middle">擅自品尝材料!</text>
+                    </g>
+
+                    <!-- 3: 科学室垃圾桶里丢满垃圾（应该丢去外面垃圾桶） -->
+                    <g id="m-item-3" class="mirror-hotspot" onclick="clickMirrorItem(3)" transform="translate(215, 300)">
+                        <rect x="-15" y="-15" width="125" height="105" fill="rgba(255,255,255,0.01)" pointer-events="all"/>
+                        <polygon points="25,30 75,30 68,88 32,88" fill="#94a3b8" stroke="#475569" stroke-width="3"/>
+                        <text x="50" y="24" font-size="28" text-anchor="middle">🍌📄🥫</text>
+                        <text x="50" y="65" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">室内垃圾桶</text>
+                        <text x="50" y="-2" fill="#dc2626" font-size="12" font-weight="bold" text-anchor="middle">丢在室内垃圾桶!</text>
+                    </g>
+
+                    <!-- 4: 把书包带进科学室放在桌上 -->
+                    <g id="m-item-4" class="mirror-hotspot" onclick="clickMirrorItem(4)" transform="translate(640, 185)">
+                        <rect x="-15" y="-15" width="120" height="85" fill="rgba(255,255,255,0.01)" pointer-events="all"/>
+                        <text x="45" y="52" font-size="48" text-anchor="middle">🎒</text>
+                        <text x="45" y="2" fill="#dc2626" font-size="13" font-weight="bold" text-anchor="middle">带书包进来了!</text>
+                    </g>
+
+                    <!-- 修复后的正确状态层 -->
+                    <g id="m-fixed-0" class="hidden" transform="translate(115, 205)">
+                        <text x="50" y="32" fill="#16a34a" font-size="15" font-weight="bold" text-anchor="middle">✅ 禁止饮食</text>
+                    </g>
+                    <g id="m-fixed-1" class="hidden" transform="translate(290, 110)">
+                        <text x="65" y="35" fill="#16a34a" font-size="16" font-weight="bold" text-anchor="middle">✅ 安静不奔跑</text>
+                    </g>
+                    <g id="m-fixed-2" class="hidden" transform="translate(465, 205)">
+                        <text x="48" y="32" fill="#16a34a" font-size="15" font-weight="bold" text-anchor="middle">✅ 不擅自品尝</text>
+                    </g>
+                    <g id="m-fixed-3" class="hidden" transform="translate(215, 325)">
+                        <text x="50" y="30" fill="#16a34a" font-size="14" font-weight="bold" text-anchor="middle">✅ 已丢去室外</text>
+                    </g>
+                    <g id="m-fixed-4" class="hidden" transform="translate(640, 205)">
+                        <text x="45" y="32" fill="#16a34a" font-size="15" font-weight="bold" text-anchor="middle">✅ 书包放室外</text>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- 底部纠错解析卡片 -->
+            <div id="s1-rule-tip" class="bg-purple-100 border-2 border-purple-300 rounded-2xl p-3 text-center text-xs md:text-sm font-bold text-purple-900">
+                💡 点击上方镜子中 5 个红色的违规地方，帮小公主把科学室变安全！
+            </div>
+        </div>
+
+        <!-- ==================== 第二关：门卫安检门（解锁皇冠 👑） ==================== -->
+        <div id="stage2-screen" class="hidden p-5 md:p-8 flex-1 flex flex-col justify-between bg-gradient-to-b from-purple-50/70 to-pink-50/50">
+            <div class="text-center">
+                <span class="inline-block bg-purple-100 text-purple-700 font-black px-3 py-1 rounded-full text-xs mb-1">
+                    讲义第6页 · 进入科学室前（物品检查 <span id="s2-step">1</span> / 6）
+                </span>
+                <h2 class="text-lg md:text-2xl font-black text-slate-800">排好队准备进科学室啦！这件物品可以带进去吗？</h2>
+            </div>
+
+            <!-- 安检台待检物品卡片 -->
+            <div id="s2-card" class="my-auto mx-auto bg-white border-4 border-purple-300 rounded-[2rem] p-6 md:p-8 max-w-md w-full text-center shadow-lg pop-in">
+                <div class="inline-block bg-amber-100 text-amber-800 font-black text-xs px-3 py-0.5 rounded-full mb-2">
+                    👸 皇家科学室安检门
+                </div>
+                <div id="s2-emoji" class="text-7xl md:text-8xl mb-3">🎒</div>
+                <h3 id="s2-name" class="text-2xl md:text-3xl font-black text-slate-800">大书包</h3>
+                <p id="s2-desc" class="text-xs md:text-sm text-slate-500 font-bold mt-1">装满了课本和杂物的大书包</p>
+            </div>
+
+            <!-- 放行 vs 放外面架子 -->
+            <div class="grid grid-cols-2 gap-4 max-w-2xl mx-auto w-full mt-4">
+                <button onclick="checkStage2(true)" class="btn-magic bg-gradient-to-b from-emerald-400 to-teal-500 border-4 border-emerald-200 text-white rounded-3xl p-5 shadow-lg flex flex-col items-center">
+                    <span class="text-3xl md:text-4xl mb-1">✅🚪</span>
+                    <span class="text-lg md:text-2xl font-black">可以带进去！</span>
+                    <span class="text-xs opacity-90 font-bold mt-0.5">老师允许带入的文具/课本</span>
+                </button>
+
+                <button onclick="checkStage2(false)" class="btn-magic bg-gradient-to-b from-rose-400 to-pink-500 border-4 border-rose-200 text-white rounded-3xl p-5 shadow-lg flex flex-col items-center">
+                    <span class="text-3xl md:text-4xl mb-1">🚫🗄️</span>
+                    <span class="text-lg md:text-2xl font-black">放在科学室外！</span>
+                    <span class="text-xs opacity-90 font-bold mt-0.5">禁止带入的书包/食物/玩具</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== 第三关：紧急情况大救援（解锁水晶鞋 👠） ==================== -->
+        <div id="stage3-screen" class="hidden p-5 md:p-8 flex-1 flex flex-col justify-between bg-gradient-to-b from-amber-50/70 to-pink-50/50">
+            <div class="text-center">
+                <span class="inline-block bg-amber-100 text-amber-800 font-black px-3 py-1 rounded-full text-xs mb-1">
+                    讲义第6页 · 安全与善后规则（突发状况 <span id="s3-step">1</span> / 5）
+                </span>
+                <h2 class="text-lg md:text-2xl font-black text-slate-800">遇到下面的突发情况，小公主应该怎么做才最安全？</h2>
+            </div>
+
+            <!-- 突发状况卡片 -->
+            <div id="s3-card" class="my-auto mx-auto bg-white border-4 border-amber-300 rounded-[2rem] p-6 max-w-2xl w-full text-center shadow-lg pop-in">
+                <div id="s3-tag" class="inline-block bg-rose-500 text-white font-black text-xs px-3 py-1 rounded-full mb-2">
+                    突发状况 ①：玻璃仪器破裂
+                </div>
+                <div id="s3-emoji" class="text-6xl mb-2">🧪💥</div>
+                <h3 id="s3-problem" class="text-lg md:text-2xl font-black text-slate-800 leading-snug">
+                    做实验时，玻璃烧杯不小心掉在地上摔碎了，小公主应该怎么办？
+                </h3>
+            </div>
+
+            <!-- 三个救援选项 -->
+            <div id="s3-options" class="grid grid-cols-1 gap-3 max-w-2xl mx-auto w-full mt-4">
+                <!-- 由 JS 动态生成 -->
+            </div>
+        </div>
+
+        <!-- ==================== 温馨提示浮窗（替代 alert） ==================== -->
+        <div id="toast-banner" class="hidden absolute bottom-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full font-black text-white shadow-xl text-sm md:text-base z-40 whitespace-nowrap">
+            提示信息
+        </div>
+
+        <!-- ==================== 过关 / 最终盛装出席舞会结算画面 ==================== -->
+        <div id="end-screen" class="hidden p-8 md:p-10 text-center bg-gradient-to-b from-purple-50 via-pink-50 to-amber-50 flex-1 flex flex-col items-center justify-center">
+            <div id="end-emoji" class="text-7xl md:text-8xl mb-3 float-royal">👗👑✨</div>
+            <h2 id="end-title" class="text-3xl md:text-4xl font-black text-purple-700 mb-2">第一关完成！解锁【梦幻蓬蓬礼服】！</h2>
+            <p id="end-desc" class="text-slate-600 font-bold text-sm md:text-base max-w-lg mb-6">
+                科学室里的 5 个安全隐患全部排除啦！小公主穿上了美丽的粉色礼服！
+            </p>
+
+            <!-- 皇家舞会装扮展示盒 -->
+            <div class="bg-white border-4 border-purple-300 rounded-3xl p-6 mb-7 w-full max-w-md shadow-lg">
+                <div class="text-xs text-pink-500 font-black mb-1">✨ 已解锁舞会装扮 ✨</div>
+                <div id="end-wardrobe" class="text-4xl my-2 tracking-widest">👗 👑🔒 👠🔒</div>
+                <div id="end-medal" class="text-xl md:text-2xl font-black text-purple-700 mb-3">🪞 魔法镜子安全小卫士</div>
+                <div class="border-t-2 border-purple-100 pt-3 flex justify-around">
+                    <div>
+                        <div class="text-xs text-slate-400 font-bold">皇家宝石</div>
+                        <div id="end-score" class="text-2xl font-black text-amber-500">0 💎</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400 font-bold">规则掌握度</div>
+                        <div class="text-2xl font-black text-emerald-500">100% 🌟</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <button id="next-stage-btn" onclick="goNextStage()" class="btn-magic bg-gradient-to-r from-purple-500 to-pink-500 text-white font-black text-lg md:text-xl px-9 py-4 rounded-full shadow-lg">
+                    继续解锁下一件装扮 ➡️
+                </button>
+                <button onclick="showHome()" class="btn-magic bg-white hover:bg-purple-50 text-purple-700 font-black text-lg px-7 py-4 rounded-full border-2 border-purple-300">
+                    返回化妆间大厅 🪞
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ==================== 题库数据（100% 对应讲义第 6 页：单元二 科学室规则） ====================
+
+        // 第一关：魔法镜子 5 处违规行为解析（对应讲义第6页第1~7条）
+        const mirrorRulesInfo = [
+            "✅ 规则1：不可在科学室里吃东西和喝水！",
+            "✅ 规则2：不可在科学室里嬉戏或奔跑，以免撞翻器材受伤！",
+            "✅ 规则3：不可擅自嗅或品尝任何科学材料！",
+            "✅ 规则4：科学室里的垃圾必须丢进【科学室外的垃圾桶】！",
+            "✅ 规则5：书包必须放在【科学室外】，只带文具和课本进入！"
+        ];
+
+        // 第二关：门卫安检门（讲义第6页第1条：只携带科学课本和文具，书包/食物/玩具放外面）
+        const gateItems = [
+            { emoji: "🎒", name: "大书包", desc: "装满杂物的大书包", allowed: false, tip: "书包要放在科学室外面的架子上哦！" },
+            { emoji: "📘", name: "二年级科学课本", desc: "上课需要用到的科学课本与活动本", allowed: true, tip: "对啦！只携带科学课本和文具进入科学室！" },
+            { emoji: "✏️", name: "铅笔盒（文具）", desc: "装有铅笔、橡皮和直尺的文具盒", allowed: true, tip: "文具是做实验记录需要的，可以带进去！" },
+            { emoji: "🧃", name: "盒装果汁与零食", desc: "准备下课吃的饼干和饮料", allowed: false, tip: "科学室里禁止吃东西和喝水，请放在外面！" },
+            { emoji: "🧸", name: "毛绒小熊玩具", desc: "心爱的小玩偶", allowed: false, tip: "玩具不能带进科学室，以免影响做实验！" },
+            { emoji: "📓", name: "科学笔记簿", desc: "用来记录观察结果的练习簿", allowed: true, tip: "没错！笔记本和文具可以带进科学室！" }
+        ];
+
+        // 第三关：紧急情况大救援（讲义第6页第4、5、6、7条安全规则）
+        const emergencyCases = [
+            {
+                tag: "安全规则 ①：科学用具损坏或破裂",
+                emoji: "🧪💥",
+                problem: "做实验时，玻璃烧杯不小心滑落摔碎了，小公主应该怎么做？",
+                options: [
+                    "📢 立刻报告老师！千万不要自己用手去捡碎玻璃",
+                    "🙈 偷偷用脚把碎玻璃踢到桌子底下藏起来",
+                    "🖐️ 自己直接伸手去抓碎玻璃块"
+                ],
+                ans: 0
+            },
+            {
+                tag: "安全规则 ②：意外受伤处理",
+                emoji: "🩹✋",
+                problem: "如果在科学室里不小心割伤了手指，应该怎么处理？",
+                options: [
+                    "😢 忍着痛不告诉任何人",
+                    "📢 如果受伤，必须立刻报告老师，让老师帮忙处理伤口",
+                    "💦 随便沾一点实验用的颜色水涂在伤口上"
+                ],
+                ans: 1
+            },
+            {
+                tag: "安全规则 ③：离开科学室前",
+                emoji: "🚪🪑",
+                problem: "下课铃响了，准备排队离开科学室前，一定要检查什么？",
+                options: [
+                    "🏃‍♀️ 抢第一个冲出科学室大门",
+                    "🔌 随便把水龙头开着让水一直流",
+                    "🪑 把椅子排整齐，关好水龙头和电源开关，排队离开"
+                ],
+                ans: 2
+            },
+            {
+                tag: "安全规则 ④：听从老师指示",
+                emoji: "👩‍🏫🔬",
+                problem: "科学桌上摆着酒精灯和化学试剂，老师还没宣布开始实验，小公主应该怎么做？",
+                options: [
+                    "👩‍🏫 必须遵从老师的指示，没有得到允许绝不擅自触摸或点火",
+                    "🔥 自己先划火柴把酒精灯点着玩",
+                    "🧪 把两瓶液体倒在一起看看会不会爆炸"
+                ],
+                ans: 0
+            },
+            {
+                tag: "安全规则 ⑤：垃圾处理规定",
+                emoji: "🗑️🚮",
+                problem: "削铅笔的碎屑和擦完桌子的废纸，应该丢在哪里？",
+                options: [
+                    "🕳️ 塞进实验桌的抽屉里",
+                    "🗑️ 丢进【科学室外的垃圾桶】里，保持科学室清洁",
+                    "🌊 丢进清洗水槽的下水道里"
+                ],
+                ans: 1
+            }
+        ];
+
+        // 全局状态
+        let isFullJourney = false;
+        let currentStage = 1;
+        let gemScore = 0;
+        let unlockedOutfits = [false, false, false]; // 0:礼服, 1:皇冠, 2:水晶鞋
+        let mirrorFound = [false, false, false, false, false];
+        let s2Idx = 0;
+        let s3Idx = 0;
+        let isLocked = false;
+
+        function showToast(msg, isGood) {
+            const toast = document.getElementById('toast-banner');
+            toast.innerText = msg;
+            toast.className = `absolute bottom-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full font-black text-white shadow-xl text-sm md:text-base z-40 whitespace-nowrap pop-in ${
+                isGood ? 'bg-gradient-to-r from-emerald-500 to-teal-500' : 'bg-gradient-to-r from-rose-500 to-pink-600'
+            }`;
+            toast.classList.remove('hidden');
+            clearTimeout(window.castleToastTimer);
+            window.castleToastTimer = setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 1450);
+        }
+
+        function shakeStage() {
+            const st = document.getElementById('castle-stage');
+            st.classList.add('shake');
+            setTimeout(() => st.classList.remove('shake'), 350);
+        }
+
+        function updateHUD() {
+            document.getElementById('gem-score').innerText = gemScore;
+            const dress = unlockedOutfits[0] ? '👗✨' : '👗🔒';
+            const crown = unlockedOutfits[1] ? '👑✨' : '👑🔒';
+            const shoe = unlockedOutfits[2] ? '👠✨' : '👠🔒';
+            document.getElementById('outfit-icons').innerText = `${dress} ${crown} ${shoe}`;
+        }
+
+        function hideAllScreens() {
+            ['start-screen', 'stage1-screen', 'stage2-screen', 'stage3-screen', 'end-screen'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+        }
+
+        function showHome() {
+            hideAllScreens();
+            document.getElementById('hud').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        function startFullMakeover() {
+            isFullJourney = true;
+            gemScore = 0;
+            unlockedOutfits = [false, false, false];
+            startStage(1, true);
+        }
+
+        function startStage(stageNum, keepProgress = false) {
+            currentStage = stageNum;
+            if (!keepProgress) {
+                isFullJourney = false;
+                gemScore = 0;
+            }
+            isLocked = false;
+
+            hideAllScreens();
+            document.getElementById('hud').classList.remove('hidden');
+            updateHUD();
+
+            if (stageNum === 1) {
+                document.getElementById('stage-badge').innerText = "装扮第一关";
+                document.getElementById('stage-title').innerText = "魔法镜子找隐患";
+                document.getElementById('stage-sub').innerText = "讲义第6页：点出镜中 5 个违反科学室规则的行为";
+                mirrorFound = [false, false, false, false, false];
+                document.getElementById('s1-found').innerText = "0";
+                document.getElementById('s1-rule-tip').innerText = "💡 点击上方镜子中 5 个红色的违规地方，帮小公主把科学室变安全！";
+                for (let i = 0; i < 5; i++) {
+                    document.getElementById(`m-item-${i}`).classList.remove('hidden');
+                    document.getElementById(`m-fixed-${i}`).classList.add('hidden');
+                }
+                document.getElementById('stage1-screen').classList.remove('hidden');
+            } else if (stageNum === 2) {
+                document.getElementById('stage-badge').innerText = "装扮第二关";
+                document.getElementById('stage-title').innerText = "门卫安检门";
+                document.getElementById('stage-sub').innerText = "讲义第6页：只携带科学课本和文具进入科学室";
+                s2Idx = 0;
+                document.getElementById('stage2-screen').classList.remove('hidden');
+                renderStage2();
+            } else if (stageNum === 3) {
+                document.getElementById('stage-badge').innerText = "装扮第三关";
+                document.getElementById('stage-title').innerText = "紧急情况大救援";
+                document.getElementById('stage-sub').innerText = "讲义第6页：突发情况报告老师与离开前检查";
+                s3Idx = 0;
+                document.getElementById('stage3-screen').classList.remove('hidden');
+                renderStage3();
+            }
+        }
+
+        // ==================== 第一关逻辑：魔法镜子找隐患 ====================
+        function clickMirrorItem(idx) {
+            if (isLocked || mirrorFound[idx]) return;
+            mirrorFound[idx] = true;
+            gemScore += 70;
+            updateHUD();
+
+            document.getElementById(`m-item-${idx}`).classList.add('hidden');
+            document.getElementById(`m-fixed-${idx}`).classList.remove('hidden');
+
+            const count = mirrorFound.filter(Boolean).length;
+            document.getElementById('s1-found').innerText = count;
+            document.getElementById('s1-rule-tip').innerText = mirrorRulesInfo[idx];
+            showToast(`✨ 纠错成功！+70 💎`, true);
+
+            if (count >= 5) {
+                isLocked = true;
+                unlockedOutfits[0] = true;
+                updateHUD();
+                setTimeout(() => showStageComplete(1), 950);
+            }
+        }
+
+        // ==================== 第二关逻辑：门卫安检门 ====================
+        function renderStage2() {
+            const item = gateItems[s2Idx];
+            document.getElementById('s2-step').innerText = s2Idx + 1;
+            document.getElementById('s2-emoji').innerText = item.emoji;
+            document.getElementById('s2-name').innerText = item.name;
+            document.getElementById('s2-desc').innerText = item.desc;
+
+            const card = document.getElementById('s2-card');
+            card.classList.remove('pop-in');
+            void card.offsetWidth;
+            card.classList.add('pop-in');
+        }
+
+        function checkStage2(userSaysAllowed) {
+            if (isLocked) return;
+            const item = gateItems[s2Idx];
+            if (userSaysAllowed === item.allowed) {
+                gemScore += 60;
+                updateHUD();
+                showToast(`🎉 判断正确！${item.tip} +60 💎`, true);
+                s2Idx++;
+                if (s2Idx >= gateItems.length) {
+                    isLocked = true;
+                    unlockedOutfits[1] = true;
+                    updateHUD();
+                    setTimeout(() => showStageComplete(2), 850);
+                } else {
+                    renderStage2();
+                }
+            } else {
+                shakeStage();
+                showToast(`🚨 安检警报！${item.tip}`, false);
+            }
+        }
+
+        // ==================== 第三关逻辑：紧急情况大救援 ====================
+        function renderStage3() {
+            const item = emergencyCases[s3Idx];
+            document.getElementById('s3-step').innerText = s3Idx + 1;
+            document.getElementById('s3-tag').innerText = item.tag;
+            document.getElementById('s3-emoji').innerText = item.emoji;
+            document.getElementById('s3-problem').innerText = item.problem;
+
+            const card = document.getElementById('s3-card');
+            card.classList.remove('pop-in');
+            void card.offsetWidth;
+            card.classList.add('pop-in');
+
+            document.getElementById('s3-options').innerHTML = item.options.map((opt, idx) => `
+                <button onclick="checkStage3(${idx})" class="btn-magic text-left bg-white hover:bg-purple-600 hover:text-white border-3 border-purple-300 text-slate-800 font-black text-base md:text-lg p-4 rounded-2xl shadow-sm flex items-center space-x-3">
+                    <span class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-black shrink-0">${['A','B','C'][idx]}</span>
+                    <span>${opt}</span>
+                </button>
+            `).join('');
+        }
+
+        function checkStage3(chosenIdx) {
+            if (isLocked) return;
+            const item = emergencyCases[s3Idx];
+            if (chosenIdx === item.ans) {
+                gemScore += 80;
+                updateHUD();
+                showToast(`🌟 太棒了！这才是遵守科学室规则的安全做法！+80 💎`, true);
+                s3Idx++;
+                if (s3Idx >= emergencyCases.length) {
+                    isLocked = true;
+                    unlockedOutfits[2] = true;
+                    updateHUD();
+                    setTimeout(() => showStageComplete(3), 850);
+                } else {
+                    renderStage3();
+                }
+            } else {
+                shakeStage();
+                showToast(`⚠️ 这样做很危险哦！再选一个最安全的科学室规则！`, false);
+            }
+        }
+
+        // ==================== 关卡结算 ====================
+        function showStageComplete(stageNum) {
+            hideAllScreens();
+            document.getElementById('hud').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+
+            const nextBtn = document.getElementById('next-stage-btn');
+            document.getElementById('end-score').innerText = `${gemScore} 💎`;
+
+            const w0 = unlockedOutfits[0] ? '👗✨' : '👗🔒';
+            const w1 = unlockedOutfits[1] ? '👑✨' : '👑🔒';
+            const w2 = unlockedOutfits[2] ? '👠✨' : '👠🔒';
+            document.getElementById('end-wardrobe').innerText = `${w0}  ${w1}  ${w2}`;
+
+            if (stageNum === 1) {
+                document.getElementById('end-emoji').innerText = '👗✨🪞';
+                document.getElementById('end-title').innerText = '第一关完成！解锁【梦幻蓬蓬礼服】！';
+                document.getElementById('end-desc').innerText = '你找出了镜子里所有的违规行为！小公主穿上了美丽的礼服，继续去安检门解锁皇冠吧！';
+                document.getElementById('end-medal').innerText = '🪞 魔法镜子安全小卫士';
+                nextBtn.classList.remove('hidden');
+            } else if (stageNum === 2) {
+                document.getElementById('end-emoji').innerText = '👑✨👸';
+                document.getElementById('end-title').innerText = '第二关完成！解锁【璀璨星光皇冠】！';
+                document.getElementById('end-desc').innerText = '安检门检查得一丝不苟！只剩最后一双水晶鞋就能去参加舞会啦！';
+                document.getElementById('end-medal').innerText = '🚪 科学室文明安检官';
+                nextBtn.classList.remove('hidden');
+            } else {
+                document.getElementById('end-emoji').innerText = '👸👗👑👠🏰';
+                document.getElementById('end-title').innerText = '全套装扮集齐！小公主盛装出席舞会！';
+                document.getElementById('end-desc').innerText = '太厉害了！你完全掌握了讲义第6页的【单元二：科学室规则】，是最优雅又守纪律的皇家小科学家！';
+                document.getElementById('end-medal').innerText = '👑 皇家舞会科学小公主';
+                nextBtn.classList.add('hidden');
+            }
+        }
+
+        function goNextStage() {
+            if (currentStage < 3) {
+                startStage(currentStage + 1, true);
+            }
+        }
+    </script>
+</body>
+</html>
